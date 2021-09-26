@@ -21,17 +21,17 @@ async function getAccessToken() {
   return data.access_token
 }
 
-async function getArtistImageFromSpotify(query) {
+async function getArtistImageFromSpotify(query, type) {
   const accessToken = await getAccessToken()
   const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
     query
-  )}&type=artist`
+  )}&type=${type}`
   const { data } = await axios.get(url, {
     headers: {
       Authorization: `Bearer ${accessToken}`
     }
   })
-  return data.artists.items[0].images || []
+  return data.artists.items[0].images.map((image) => image.url) || []
 }
 
 module.exports = { getArtistImageFromSpotify }

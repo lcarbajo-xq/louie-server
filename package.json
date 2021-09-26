@@ -8,6 +8,7 @@
     "serve": "vite preview"
   },
   "devDependencies": {
+    "standard": "^16.0.3",
     "vite": "2.5.4"
   },
   "eslintConfig": {
@@ -17,8 +18,11 @@
     "@wellenline/via": "2.3.1",
     "axios": "0.21.4",
     "cors": "2.8.5",
+    "crypto": "^1.0.1",
+    "disconnect": "^1.2.2",
     "dotenv": "10.0.0",
     "express": "4.17.1",
+    "mongoose": "6.0.7",
     "multer": "1.4.3",
     "nodemon": "2.0.12"
   }

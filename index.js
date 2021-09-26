@@ -1,24 +1,31 @@
 const express = require('express')
 const cors = require('cors')
-const via = require('@wellenline/via')
 require('dotenv').config()
 
-const hello = require('./routes/Hello')
-const lastfm = require('./routes/LastFM')
+const { dbConnection } = require('./db/config')
+
+const artists = require('./routes/artists')
+const discogs = require('./routes/discogs')
+const albums = require('./routes/albums')
 
 // Initialize
 
 const app = express()
 
-// // Midddlewares
+// Midddlewares
 
 app.use(cors())
 
+// DB Connection
+
+dbConnection()
+
 // Routes
 
-app.use(hello)
-app.use(lastfm)
+app.use(artists)
+app.use(discogs)
+app.use(albums)
 
-app.listen(process.env.PORT === undefined && '3000')
+app.listen(process.env.PORT || '3000')
 
 console.log(`Server Running on port ${process.env.PORT}`)
