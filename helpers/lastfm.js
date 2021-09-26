@@ -6,17 +6,17 @@ async function getAlbumData({ name, artist }) {
   const url = `http://ws.audioscrobbler.com/2.0/?method=album.getInfo&artist=${encodeURIComponent(
     artist.name
   )}&album=${encodeURIComponent(
-    name.replace(/'/g, '')
+    name
+    // .replace(/'/g, '')
   )}&api_key=${LASTFM_API_KEY}&format=json`
   try {
     if (LASTFM_API_KEY) {
       const { data } = await axios.get(url)
 
       if (data.album) {
-        const albumArtist = await getArtistData(artist)
+        // const albumArtist = await getArtistData(artist)
         return {
           tracks: data.album.tracks,
-          artist: albumArtist,
           image: data.album.image.map((i) => i['#text']),
           tags: data.album.tags?.tag?.name
             ? data.album.tags?.tag?.name
@@ -43,7 +43,7 @@ async function getArtistData({ name }) {
 
       if (data.artist) {
         return {
-          // hash: data.artist.mbid,
+          name: data.artist.name,
           tags: data.artist.tags.tag.map((tag) => tag.name),
           bio: data.artist.bio.summary.replace(/(&nbsp;|<([^>]+)>)/gi, ''),
           similar: data.artist.similar.artist.map((a) => a.name)

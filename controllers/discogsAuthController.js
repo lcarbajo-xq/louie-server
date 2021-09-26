@@ -12,20 +12,38 @@ let accessDataFromDiscogs = {
   token: 'EnpnKwabUCSqsRbLBOSwobhYyUQjWOhRgaLZWsTK',
   tokenSecret: 'lHmxfEXtYGXrXBrFJwRTPOVVPnUaAeDjWrRdfsaJ'
 }
+const db = new Discogs(accessDataFromDiscogs).database()
 
 function getAccessDataFromDiscogs() {
   return accessDataFromDiscogs
 }
 
-async function getLabelInfo(req, res) {
-  const accessData = getAccessDataFromDiscogs()
-  const labelID = req.params.id
-  const db = new Discogs(accessData).database()
+async function getLabelById(req, res) {
+  const { id: labelID } = req.params
   db.getLabel(labelID, function (err, data) {
     if (!err) {
-      res.status(200).json(data)
+      res.status(200).json({
+        label: data,
+        ok: true
+      })
     } else {
-      console.log(err)
+      res.status(404).json({ err, ok: false })
+    }
+  })
+}
+
+async function getLabelReleases(req, res) {
+  const { page = 0, items = 25 } = req.query
+  const { id: labelId } = req.params
+  db.getLabelReleases(labelId, { page, per_page: items }, function (err, data) {
+    if (!err) {
+      res.status(200).json({
+        query: 'Releases for Label: ' + labelId,
+        releases: data,
+        ok: true
+      })
+    } else {
+      res.status(404).json({ err, ok: false })
     }
   })
 }
@@ -66,6 +84,7 @@ async function getAccessToken(req, res) {
 module.exports = {
   getRequestToken,
   getAccessToken,
-  getLabelInfo,
+  getLabelById,
+  getLabelReleases,
   getAccessDataFromDiscogs
 }

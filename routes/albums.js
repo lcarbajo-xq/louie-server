@@ -1,9 +1,14 @@
 const { Router } = require('express')
-const { setTopAlbums } = require('../controllers/albumController')
+const {
+  setTopAlbums,
+  getAlbumsFromArtist
+} = require('../controllers/albumController')
 
 const router = Router()
 
-router.get('/albums', setTopAlbums)
+router.get('/albums/set', setTopAlbums)
+
+router.get('/albums/artist/:artistId', getAlbumsFromArtist)
 
 // router.get('/artists/:id', getArtistById)
 

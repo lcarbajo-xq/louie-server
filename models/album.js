@@ -6,6 +6,10 @@ const AlbumSchema = new Schema({
     type: String,
     required: true
   },
+  hash: {
+    type: String,
+    required: true
+  },
   artist: {
     type: Schema.Types.ObjectId,
     ref: 'ArtistModel'

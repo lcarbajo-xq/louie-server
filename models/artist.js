@@ -33,15 +33,19 @@ const ArtistSchema = new Schema({
 })
 
 ArtistSchema.static('findOrCreate', async function (artist) {
-  const hash = createHash('md5')
-    .update(artist.name.toLowerCase().replace(/ /g, '_').trim())
-    .digest('hex')
-  let artistExist = await this.findOne({ hash })
-  if (!artistExist) {
-    artistExist = await this.create({ ...artist, hash })
-    console.log('Dont Exist')
+  try {
+    const hash = createHash('md5')
+      .update(artist.name.toLowerCase().replace(/ /g, '_').trim())
+      .digest('hex')
+    let artistExist = await this.findOne({ hash })
+    if (!artistExist) {
+      artistExist = await this.create({ ...artist, hash })
+      console.log('Dont Exist: ')
+    }
+    return artistExist
+  } catch (err) {
+    console.log('ERROR EN ESCRITURA : ' + err)
   }
-  return artist
 })
 
 ArtistSchema.static('random', async function (size = 5) {

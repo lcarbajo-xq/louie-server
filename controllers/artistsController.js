@@ -1,12 +1,8 @@
 const axios = require('axios')
 const ArtistModel = require('../models/artist')
 
-const { getArtistImageFromSpotify } = require('../helpers/spotify')
-
-const {
-  getArtistData,
-  seacrhSimilarArtistsLastFM
-} = require('../helpers/lastfm')
+const { seacrhSimilarArtistsLastFM } = require('../helpers/lastfm')
+const { parseNewArtist } = require('../helpers/dbHelpers')
 
 const { LASTFM_API_KEY } = process.env
 
@@ -18,17 +14,27 @@ async function getArtistsFromDB(req, res) {
   const skip = req.query.skip || 0
   const limit = req.query.limit || 20
 
-  res.status(200).json({
-    artists: await ArtistModel.find()
-      .sort(req.query.sort || '-created_at')
-      .skip(skip)
-      .limit(limit),
-    total: await ArtistModel.countDocuments(),
-    query: {
-      skip,
-      limit
-    }
-  })
+  try {
+    res.status(200).json({
+      artists: await ArtistModel.find()
+        .sort(req.query.sort || '-created_at')
+        .skip(skip)
+        .limit(limit),
+      total: await ArtistModel.countDocuments(),
+      query: {
+        skip,
+        limit
+      }
+    })
+  } catch (err) {
+    res.status(404).json({
+      error: err,
+      query: {
+        skip,
+        limit
+      }
+    })
+  }
 }
 
 async function setTopArtists(req, res) {
@@ -38,24 +44,9 @@ async function setTopArtists(req, res) {
 
   const artistMapped = await Promise.all(
     topartists.artist.map(async (artist) => {
-      let image = []
-      const { name } = artist
-      if (name) {
-        image = await getArtistImageFromSpotify(name, 'artist')
-      }
-      const artistData = await getArtistData(artist)
-      const artistModeled = {
-        name,
-        hash: artistData.hash || '',
-        image,
-        tags: artistData?.tags || [],
-        similar: artistData?.similar || [],
-        bio: artistData?.bio || '',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
-      await ArtistModel.findOrCreate(artistModeled)
-      return artistModeled
+      const parsedArtist = await parseNewArtist(artist)
+      await ArtistModel.findOrCreate(parsedArtist)
+      return parsedArtist
     })
   )
   res.status(200).json(artistMapped)
