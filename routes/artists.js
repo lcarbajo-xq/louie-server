@@ -1,10 +1,10 @@
-const { Router } = require('express')
-const {
+import Router from 'express'
+import {
   getSimilarArtistsLastFM,
   getArtistById,
   getArtistsFromDB,
   setTopArtists
-} = require('../controllers/artistsController')
+} from '../controllers/artistsController.js'
 
 const router = Router()
 
@@ -16,4 +16,4 @@ router.get('/artists/:id', getArtistById)
 
 router.get('/artists/:id/similar', getSimilarArtistsLastFM)
 
-module.exports = router
+export default router

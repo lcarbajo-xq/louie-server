@@ -1,5 +1,4 @@
-const axios = require('axios')
-
+import axios from 'axios'
 const { LASTFM_API_KEY } = process.env
 
 async function getAlbumData({ name, artist }) {
@@ -63,4 +62,4 @@ async function seacrhSimilarArtistsLastFM(id) {
   return data
 }
 
-module.exports = { getArtistData, getAlbumData, seacrhSimilarArtistsLastFM }
+export { getArtistData, getAlbumData, seacrhSimilarArtistsLastFM }

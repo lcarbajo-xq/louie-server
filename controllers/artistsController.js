@@ -1,8 +1,8 @@
-const axios = require('axios')
-const ArtistModel = require('../models/artist')
+import axios from 'axios'
+import { ArtistModel } from '../models/artist.js'
 
-const { seacrhSimilarArtistsLastFM } = require('../helpers/lastfm')
-const { parseNewArtist } = require('../helpers/dbHelpers')
+import { seacrhSimilarArtistsLastFM } from '../helpers/lastfm.js'
+import { parseNewArtist } from '../helpers/dbHelpers.js'
 
 const { LASTFM_API_KEY } = process.env
 
@@ -11,16 +11,16 @@ async function randomArtists(req, res) {
 }
 
 async function getArtistsFromDB(req, res) {
-  const skip = req.query.skip || 0
-  const limit = req.query.limit || 20
+  const skip = req.query.skip ? parseInt(req.query.skip) : 0
+  const limit = req.query.limit ? parseInt(req.query.limit) : 20
+  const sort = req.query.sort || 'hash'
+
+  const artists = await ArtistModel.find().sort(sort).skip(skip).limit(limit)
 
   try {
     res.status(200).json({
-      artists: await ArtistModel.find()
-        .sort(req.query.sort || '-created_at')
-        .skip(skip)
-        .limit(limit),
-      total: await ArtistModel.countDocuments(),
+      artists,
+      total: artists.length,
       query: {
         skip,
         limit
@@ -65,7 +65,7 @@ async function getSimilarArtistsLastFM(req, res) {
   res.status(200).json(similarArtists)
 }
 
-module.exports = {
+export {
   getArtistsFromDB,
   setTopArtists,
   randomArtists,

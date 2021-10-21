@@ -1,12 +1,20 @@
-const axios = require('axios')
-const { parseNewAlbum } = require('../helpers/dbHelpers')
-
-const AlbumModel = require('../models/album')
+import axios from 'axios'
+import { parseNewAlbum } from '../helpers/dbHelpers.js'
+import { existsSync, readFileSync } from 'fs'
+import { AlbumModel } from '../models/album.js'
 
 const { LASTFM_API_KEY } = process.env
 
 async function randomAlbums(req, res) {
   return await AlbumModel.random(req.query.total)
+}
+
+async function getAlbumArt(req, res) {
+  const id = req.params.id
+  const image = existsSync(`${process.env.CACHE_PATH}/album-art/${id}`)
+    ? readFileSync(`${process.env.CACHE_PATH}/album-art/${id}`)
+    : readFileSync('./assets/placeholder.png')
+  res.type('image/png').send(image)
 }
 
 async function setTopAlbums(req, res) {
@@ -36,14 +44,23 @@ async function setTopAlbums(req, res) {
 }
 
 async function getAlbumsFromDB(req, res) {
-  const { skip = 0, limit = 20, sort = '-created-at' } = req.query
+  const skip = req.query.skip ? parseInt(req.query.skip) : 0
+  const limit = req.query.limit ? parseInt(req.query.limit) : 20
+  const sort = req.query.sort || 'hash'
+
+  const albumsonDB = await AlbumModel.find()
+    .populate('artist')
+    .sort(sort)
+    .skip(skip)
+    .limit(limit)
   try {
     res.status(200).json({
-      artists: await AlbumModel.find().sort(sort).skip(skip).limit(limit),
-      total: await AlbumModel.countDocuments(),
+      albums: albumsonDB,
+      total: albumsonDB.length,
       query: {
         skip,
-        limit
+        limit,
+        sort
       }
     })
   } catch (err) {
@@ -60,7 +77,7 @@ async function getAlbumsFromDB(req, res) {
 
 async function getAlbumsFromArtist(req, res) {
   const { artistId } = req.params
-  const { skip = 0, limit = 20, sort = '-created-at' } = req.query
+  const { skip = 20, limit = 20, sort = '-created-at' } = req.query
 
   const query = { artist: artistId }
 
@@ -92,9 +109,10 @@ async function getAlbumsFromArtist(req, res) {
   }
 }
 
-module.exports = {
+export {
   setTopAlbums,
   getAlbumsFromDB,
   getAlbumsFromArtist,
-  randomAlbums
+  randomAlbums,
+  getAlbumArt
 }

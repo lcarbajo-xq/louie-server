@@ -1,10 +1,10 @@
-const { Router } = require('express')
-const {
+import Router from 'express'
+import {
   getRequestToken,
   getAccessToken,
   getLabelById,
   getLabelReleases
-} = require('../controllers/discogsAuthController')
+} from '../controllers/discogsAuthController.js'
 const router = Router()
 
 router.get('/discogs/authorize', getRequestToken)
@@ -15,4 +15,4 @@ router.get('/discogs/label/:id', getLabelById)
 
 router.get('/discogs/label/:id/releases', getLabelReleases)
 
-module.exports = router
+export default router

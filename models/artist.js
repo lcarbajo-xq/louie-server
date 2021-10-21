@@ -1,5 +1,7 @@
-const { createHash } = require('crypto')
-const { Schema, model } = require('mongoose')
+import { createHash } from 'crypto'
+import mongoose from 'mongoose'
+
+const { Schema, model } = mongoose
 
 const ArtistSchema = new Schema({
   name: {
@@ -33,23 +35,19 @@ const ArtistSchema = new Schema({
 })
 
 ArtistSchema.static('findOrCreate', async function (artist) {
-  try {
-    const hash = createHash('md5')
-      .update(artist.name.toLowerCase().replace(/ /g, '_').trim())
-      .digest('hex')
-    let artistExist = await this.findOne({ hash })
-    if (!artistExist) {
-      artistExist = await this.create({ ...artist, hash })
-      console.log('Dont Exist: ')
-    }
-    return artistExist
-  } catch (err) {
-    console.log('ERROR EN ESCRITURA : ' + err)
+  const hash = createHash('md5')
+    .update(artist.name.toLowerCase().replace(/ /g, '_').trim())
+    .digest('hex')
+  let artistExist = await this.findOne({ hash })
+  if (!artistExist) {
+    artistExist = await this.create({ ...artist, hash })
+    console.log('Dont Exist: ')
   }
+  return artistExist._id
 })
 
 ArtistSchema.static('random', async function (size = 5) {
   return this.aggregate([{ $sample: { size } }])
 })
 
-module.exports = model('ArtistModel', ArtistSchema)
+export const ArtistModel = model('ArtistModel', ArtistSchema)

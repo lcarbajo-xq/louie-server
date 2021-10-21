@@ -1,6 +1,6 @@
-const { getArtistData, getAlbumData } = require('./lastfm')
-const { getArtistImageFromSpotify } = require('./spotify')
-const ArtistModel = require('../models/artist')
+import { getArtistData, getAlbumData } from './lastfm.js'
+import { getArtistImageFromSpotify } from './spotify.js'
+import { ArtistModel } from '../models/artist.js'
 
 async function parseNewArtist(artist) {
   let image = []
@@ -42,4 +42,4 @@ async function parseNewAlbum(album) {
   }
 }
 
-module.exports = { parseNewArtist, parseNewAlbum }
+export { parseNewArtist, parseNewAlbum }

@@ -1,4 +1,4 @@
-const axios = require('axios')
+import axios from 'axios'
 
 const { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET } = process.env
 
@@ -33,5 +33,4 @@ async function getArtistImageFromSpotify(query, type) {
   })
   return data.artists.items[0].images.map((image) => image.url) || []
 }
-
-module.exports = { getArtistImageFromSpotify }
+export { getArtistImageFromSpotify }

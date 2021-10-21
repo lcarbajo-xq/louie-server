@@ -1,5 +1,7 @@
 // const url = 'https://api.discogs.com'
-const Discogs = require('disconnect').Client
+import Discogs from 'disconnect'
+
+const DiscogsClient = Discogs.Client
 
 const { DISCOGS_CONSUMER_KEY, DISCOGS_CONSUMER_SECRET } = process.env
 
@@ -12,7 +14,7 @@ let accessDataFromDiscogs = {
   token: 'EnpnKwabUCSqsRbLBOSwobhYyUQjWOhRgaLZWsTK',
   tokenSecret: 'lHmxfEXtYGXrXBrFJwRTPOVVPnUaAeDjWrRdfsaJ'
 }
-const db = new Discogs(accessDataFromDiscogs).database()
+const db = new DiscogsClient(accessDataFromDiscogs).database()
 
 function getAccessDataFromDiscogs() {
   return accessDataFromDiscogs
@@ -81,7 +83,7 @@ async function getAccessToken(req, res) {
   })
 }
 
-module.exports = {
+export {
   getRequestToken,
   getAccessToken,
   getLabelById,

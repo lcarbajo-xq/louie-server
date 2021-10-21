@@ -1,5 +1,8 @@
-const { createHash } = require('crypto')
-const { Schema, model } = require('mongoose')
+import mongoose from 'mongoose'
+import { createHash } from 'crypto'
+import { writeFileSync } from 'fs'
+
+const { Schema, model } = mongoose
 
 const AlbumSchema = new Schema({
   name: {
@@ -44,13 +47,22 @@ AlbumSchema.statics.findOrCreate = async function (album) {
   let albumExists = await this.findOne({ name: album.name })
 
   if (!albumExists) {
+    console.log(typeof album.image)
     const hash = await createHash('md5')
       .update(`${album?.artist?.name || ''}-${album.name}`)
       .digest('hex')
+    if (album.image && typeof album.image === 'object') {
+      console.log('OBJECt')
+      writeFileSync(
+        `${process.env.CACHE_PATH}/album-art/${hash}.png`,
+        album.image
+      )
+      album.image = `/albums/art/${hash}.png`
+    }
     albumExists = await this.create({ ...album, hash })
     console.log('Dont Exist')
   }
   return albumExists
 }
 
-module.exports = model('AlbumModel', AlbumSchema)
+export const AlbumModel = model('AlbumModel', AlbumSchema)
