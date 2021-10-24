@@ -17,6 +17,7 @@ const library = {
 
 let timer
 let tracks = []
+let deleteTracks = []
 let size = 0
 
 const { watch: dirWatch } = chokidar
@@ -52,6 +53,22 @@ export function _onFileAdded(path, stat) {
   }, 3000)
 }
 
+export function _onFileDeleted(path, stat) {
+  clearTimeout(timer)
+  if (library.ext.includes(extname(path))) {
+    deleteTracks.push({ path })
+  }
+
+  timer = setTimeout(() => {
+    // deleteTracks = deleteTracks
+    //   .sort((a, b) => b.stat.ctime - a.stat.ctime)
+    //   .map((file) => file.path)
+    //   .reverse()
+    unbuild(deleteTracks)
+    deleteTracks = []
+  }, 3000)
+}
+
 export function watch(ext = '') {
   if (ext && ext.length > 0) {
     library.ext = ext
@@ -60,7 +77,30 @@ export function watch(ext = '') {
     persistent: true
     //  alwaysStat: true,
     // ignoreInitial: true,
-  }).on('add', _onFileAdded)
+  })
+    .on('add', _onFileAdded)
+    .on('unlink', _onFileDeleted)
+}
+
+export async function unbuild(files) {
+  for (const file of files) {
+    try {
+      console.log('Starting deleting files')
+      if (file.path) {
+        const exists = await TrackModel.deleteOne({ path: file.path })
+        if (exists.deletedCount !== 0) {
+          console.log('Delete file: ', file.path)
+        }
+      } else {
+        const exists = await TrackModel.deleteOne({ path: file })
+        if (exists.deletedCount !== 0) {
+          console.log('Delete file: ', file)
+        }
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
 }
 
 export async function build(files) {
