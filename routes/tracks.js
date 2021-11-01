@@ -1,9 +1,14 @@
 import Router from 'express'
-import { getTracksfromDB } from '../controllers/trackController.js'
+import {
+  getTracksfromDB,
+  playTrackById
+} from '../controllers/trackController.js'
 
 const router = Router()
 
 router.get('/tracks/', getTracksfromDB)
+
+router.get('/tracks/play/:id', playTrackById)
 
 // router.get('/albums/set', setTopAlbums)
 

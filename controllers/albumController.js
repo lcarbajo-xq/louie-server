@@ -90,7 +90,7 @@ async function getAlbumsFromArtist(req, res) {
 
     res.status(200).json({
       albums,
-      total: await AlbumModel.countDocuments(query),
+      total: albums.length,
       query: {
         ...query,
         skip,

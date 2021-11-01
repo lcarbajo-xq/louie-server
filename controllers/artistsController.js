@@ -3,6 +3,7 @@ import { ArtistModel } from '../models/artist.js'
 
 import { seacrhSimilarArtistsLastFM } from '../helpers/lastfm.js'
 import { parseNewArtist } from '../helpers/dbHelpers.js'
+import { AlbumModel } from '../models/album.js'
 
 const { LASTFM_API_KEY } = process.env
 
@@ -55,7 +56,9 @@ async function setTopArtists(req, res) {
 async function getArtistById(req, res) {
   const { id } = req.params
   const artist = await ArtistModel.findById(id)
-  res.status(200).json(artist)
+  const albums = await AlbumModel.find({ artist: id })
+  artist.albums = albums
+  res.status(200).json({ artist, albums, totalAlbums: albums.length })
 }
 
 async function getSimilarArtistsLastFM(req, res) {
