@@ -78,11 +78,10 @@ async function playTrackById(req, res) {
     throw new Error('Failed to load track metadata')
   }
 
-  // if (track.path.toString().endsWith(".flac") && context.query.transcode) {
-  // 	track.path = await transcode(track as any, {
-  // 		output: { type: "mp3" }
-  // 	});
-  // }
+  if (track.path.toString().endsWith('.flac') && req.query.transcode) {
+    // track.path = await transcode(track as any, {output: { type: "mp3" }
+    // });
+  }
 
   const stat = statSync(track.path)
 
