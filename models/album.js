@@ -43,16 +43,35 @@ const AlbumSchema = new Schema({
   }
 })
 
+AlbumSchema.statics.random = async function (querySize = 10) {
+  const size = parseInt(querySize)
+  try {
+    const results = await this.aggregate([
+      { $sample: { size } },
+      {
+        $lookup: {
+          from: 'artistmodels',
+          localField: 'artist',
+          foreignField: '_id',
+          as: 'artist'
+        }
+      },
+      { $unwind: { path: '$artist' } }
+    ])
+    return results
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 AlbumSchema.statics.findOrCreate = async function (album) {
   let albumExists = await this.findOne({ name: album.name })
 
   if (!albumExists) {
-    console.log(typeof album.image)
     const hash = await createHash('md5')
       .update(`${album?.artist?.name || ''}-${album.name}`)
       .digest('hex')
     if (album.image && typeof album.image === 'object') {
-      console.log('OBJECt')
       writeFileSync(
         `${process.env.CACHE_PATH}/album-art/${hash}.png`,
         album.image
@@ -60,7 +79,6 @@ AlbumSchema.statics.findOrCreate = async function (album) {
       album.image = `/albums/art/${hash}.png`
     }
     albumExists = await this.create({ ...album, hash })
-    console.log('Dont Exist')
   }
   return albumExists
 }

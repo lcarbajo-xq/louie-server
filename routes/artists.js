@@ -3,12 +3,15 @@ import {
   getSimilarArtistsLastFM,
   getArtistById,
   getArtistsFromDB,
-  setTopArtists
+  setTopArtists,
+  getRandomArtists
 } from '../controllers/artistsController.js'
 
 const router = Router()
 
 router.get('/artists', getArtistsFromDB)
+
+router.get('/artists/random', getRandomArtists)
 
 router.get('/artists/set', setTopArtists)
 

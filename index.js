@@ -8,8 +8,13 @@ import artists from './routes/artists.js'
 import discogs from './routes/discogs.js'
 import albums from './routes/albums.js'
 import tracks from './routes/tracks.js'
+import search from './routes/search.js'
+import playlists from './routes/playlists.js'
 import { watch } from './common/library.js'
-dotenv.config()
+
+const { config } = dotenv
+
+config()
 
 // Initialize
 
@@ -28,6 +33,8 @@ app.use(artists)
 app.use(discogs)
 app.use(albums)
 app.use(tracks)
+app.use(search)
+app.use(playlists)
 
 app.listen(process.env.PORT || '3000')
 

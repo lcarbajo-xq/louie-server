@@ -46,8 +46,14 @@ ArtistSchema.static('findOrCreate', async function (artist) {
   return artistExist._id
 })
 
-ArtistSchema.static('random', async function (size = 5) {
-  return this.aggregate([{ $sample: { size } }])
+ArtistSchema.static('random', async function (querySize = 20) {
+  const size = parseInt(querySize)
+  try {
+    const results = await this.aggregate([{ $sample: { size } }])
+    return results
+  } catch (err) {
+    console.log(err)
+  }
 })
 
 export const ArtistModel = model('ArtistModel', ArtistSchema)

@@ -5,8 +5,22 @@ import { AlbumModel } from '../models/album.js'
 
 const { LASTFM_API_KEY } = process.env
 
-async function randomAlbums(req, res) {
-  return await AlbumModel.random(req.query.total)
+async function getRandomAlbums(req, res) {
+  try {
+    const albums = await AlbumModel.random(req.query.total)
+
+    res.status(200).json({
+      albums,
+      total: albums.length,
+      ok: true
+    })
+  } catch (err) {
+    res.status(400).json({
+      ok: false,
+      error: err,
+      endpoint: 'random albums'
+    })
+  }
 }
 
 async function getAlbumArt(req, res) {
@@ -113,6 +127,6 @@ export {
   setTopAlbums,
   getAlbumsFromDB,
   getAlbumsFromArtist,
-  randomAlbums,
+  getRandomAlbums,
   getAlbumArt
 }

@@ -1,24 +1,26 @@
 import axios from 'axios'
 
-const { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET } = process.env
-
-const basic = Buffer.from(
-  `${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`
-).toString('base64')
-
 async function getAccessToken() {
-  const { data } = await axios({
-    url: 'https://accounts.spotify.com/api/token',
-    method: 'POST',
-    params: {
-      grant_type: 'client_credentials'
-    },
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: `Basic ${basic}`
-    }
-  })
-  return data.access_token
+  try {
+    const expr = `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
+    const basic = Buffer.from(expr).toString('base64')
+    const refreshToken = process.env.SPOTIFY_REFRESH_TOKEN
+    const { data } = await axios({
+      url: 'https://accounts.spotify.com/api/token',
+      method: 'POST',
+      params: {
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken
+      },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Basic ${basic}`
+      }
+    })
+    return data.access_token
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 async function getArtistImageFromSpotify(query, type) {
@@ -33,4 +35,20 @@ async function getArtistImageFromSpotify(query, type) {
   })
   return data.artists.items[0].images.map((image) => image.url) || []
 }
-export { getArtistImageFromSpotify }
+
+async function getPlaylistsFromSpotify() {
+  try {
+    const accessToken = await getAccessToken()
+    const url = 'https://api.spotify.com/v1/me/playlists'
+    const { data } = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    })
+    return data
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+export { getArtistImageFromSpotify, getPlaylistsFromSpotify }

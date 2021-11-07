@@ -1,49 +1,60 @@
-import { AlbumModel } from '../models/album'
-import { ArtistModel } from '../models/artist'
-import { TrackModel } from '../models/track'
+import { AlbumModel } from '../models/album.js'
+import { ArtistModel } from '../models/artist.js'
+import { PlaylistModel } from '../models/playlist.js'
+import { TrackModel } from '../models/track.js'
 
 async function getItemsFromDB(req, res) {
-  const results = {
+  const searchResults = {
     albums: [],
     artists: [],
-    tracks: []
+    tracks: [],
+    playlists: []
   }
   try {
-    results.tracks = await TrackModel.find({
+    searchResults.tracks = await TrackModel.find({
       $or: [
         {
           name: {
-            $regex: req.query,
+            $regex: req.query.search,
             $options: 'i'
           }
         },
         {
           artist: {
-            $regex: req.query,
+            $regex: req.query.search,
             $options: 'i'
           }
         }
       ]
     }).populate('album genre artists')
-    results.albums = await AlbumModel.find({
+    searchResults.albums = await AlbumModel.find({
       name: {
-        $regex: req.query,
+        $regex: req.query.search,
         $options: 'i'
       }
     }).populate('artist')
 
-    results.artists = await ArtistModel.find({
+    searchResults.artists = await ArtistModel.find({
       name: {
-        $regex: req.query,
+        $regex: req.query.search,
         $options: 'i'
       }
     })
+
+    searchResults.playlists = await PlaylistModel.find({
+      name: {
+        $regex: req.query.search,
+        $options: 'i'
+      }
+    })
+
     res.status(200).json({
-      results,
+      results: searchResults,
       total: {
-        artists: results.artists.length,
-        albums: results.albums.length,
-        tracks: results.tracks.length
+        artists: searchResults.artists.length,
+        albums: searchResults.albums.length,
+        playlists: searchResults.playlists.length,
+        tracks: searchResults.tracks.length
       },
       ok: true,
       query: req.query

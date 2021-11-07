@@ -3,12 +3,15 @@ import {
   setTopAlbums,
   getAlbumsFromArtist,
   getAlbumsFromDB,
-  getAlbumArt
+  getAlbumArt,
+  getRandomAlbums
 } from '../controllers/albumController.js'
 
 const router = Router()
 
 router.get('/albums/', getAlbumsFromDB)
+
+router.get('/albums/random', getRandomAlbums)
 
 router.get('/albums/set', setTopAlbums)
 

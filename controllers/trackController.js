@@ -8,9 +8,23 @@ import mongoose from 'mongoose'
 
 // const { LASTFM_API_KEY } = process.env
 
-// async function randomAlbums(req, res) {
-//   return await AlbumModel.random(req.query.total)
-// }
+async function getRandomTracks(req, res) {
+  try {
+    const tracks = await TrackModel.random(req.query.total)
+
+    res.status(200).json({
+      tracks,
+      total: tracks.length,
+      ok: true
+    })
+  } catch (err) {
+    res.status(400).json({
+      ok: false,
+      error: err,
+      endpoint: 'random tracks'
+    })
+  }
+}
 
 // async function setTopAlbums(req, res) {
 //   const url = `https://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist=${encodeURIComponent(
@@ -152,4 +166,4 @@ async function playTrackById(req, res) {
 //   }
 // }
 
-export { getTracksfromDB, playTrackById }
+export { getTracksfromDB, getRandomTracks, playTrackById }

@@ -1,5 +1,6 @@
 import Router from 'express'
 import {
+  getRandomTracks,
   getTracksfromDB,
   playTrackById
 } from '../controllers/trackController.js'
@@ -7,6 +8,8 @@ import {
 const router = Router()
 
 router.get('/tracks/', getTracksfromDB)
+
+router.get('/tracks/random', getRandomTracks)
 
 router.get('/tracks/play/:id', playTrackById)
 

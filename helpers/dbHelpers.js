@@ -42,4 +42,38 @@ async function parseNewAlbum(album) {
   }
 }
 
-export { parseNewArtist, parseNewAlbum }
+async function parseNewPlaylist(playlist) {
+  const {
+    name,
+    external_urls: externalUrls,
+    tracks,
+    collaborative,
+    owner,
+    description,
+    images,
+    id
+  } = playlist
+  if (name !== '(null)') {
+    return {
+      name,
+      collaborative,
+      description,
+      author: {
+        id: owner.id,
+        name: owner.display_name
+      },
+      tracks: {
+        url: tracks.href,
+        total: tracks.total
+      },
+      private: !playlist.public,
+      url: externalUrls.spotify,
+      images: images[0]?.url || '',
+      spotify_id: id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  }
+}
+
+export { parseNewArtist, parseNewAlbum, parseNewPlaylist }

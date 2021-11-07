@@ -37,6 +37,43 @@ const TrackSchema = new Schema({
   createdAt: { type: Date }
 })
 
+TrackSchema.static('random', async function (querySize = 20) {
+  const size = parseInt(querySize)
+  try {
+    const results = await this.aggregate([
+      { $sample: { size } },
+      {
+        $lookup: {
+          from: 'artistmodels',
+          localField: 'artists',
+          foreignField: '_id',
+          as: 'artists'
+        }
+      },
+      {
+        $lookup: {
+          from: 'albummodels',
+          localField: 'album',
+          foreignField: '_id',
+          as: 'album'
+        }
+      },
+      { $unwind: { path: '$album' } },
+      {
+        $lookup: {
+          from: 'artistmodedls',
+          localField: 'album.artist',
+          foreignField: '_id',
+          as: 'album.artist'
+        }
+      }
+    ])
+    return results
+  } catch (error) {
+    console.log(error)
+  }
+})
+
 TrackSchema.static('findOrCreate', async function (track) {
   let trackExists = await this.findOne({ name: track.name, album: track.album })
 
