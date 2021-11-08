@@ -111,22 +111,20 @@ async function playTrackById(req, res) {
     const end = partialend || total - 1
     const chunksize = end - start + 1
 
-    res.status = 206
-    res.headers = {
+    res.status(206).set({
       'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
       'Accept-Ranges': 'bytes',
       'Content-Length': chunksize,
       'Content-Type': mime.getType(track.path) || 'audio/mp3'
-    }
+    })
 
     return createReadStream(track.path, { start, end }).pipe(res)
   } else {
-    res.status(200)
-    res.headers = {
+    res.status(206).set({
       'Content-Type': mime.getType(track.path) || 'audio/mp3',
       'Accept-Ranges': 'bytes',
       'Content-Length': stat.size
-    }
+    })
 
     return createReadStream(track.path).pipe(res)
   }
