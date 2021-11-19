@@ -89,6 +89,14 @@ async function getAlbumsFromDB(req, res) {
   }
 }
 
+async function getAlbumById(req, res) {
+  const { id } = req.params
+  const album = await AlbumModel.findById(id).populate('artist')
+  // const albums = await AlbumModel.find({ artist: id })
+  // artist.albums = albums
+  res.status(200).json({ album })
+}
+
 async function getAlbumsFromArtist(req, res) {
   const { artistId } = req.params
   const { skip = 20, limit = 20, sort = '-created-at' } = req.query
@@ -128,5 +136,6 @@ export {
   getAlbumsFromDB,
   getAlbumsFromArtist,
   getRandomAlbums,
-  getAlbumArt
+  getAlbumArt,
+  getAlbumById
 }
