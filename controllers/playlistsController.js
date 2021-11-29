@@ -1,5 +1,10 @@
+import mongoose from 'mongoose'
 import { parseNewPlaylist } from '../helpers/dbHelpers.js'
-import { getPlaylistsFromSpotify } from '../helpers/spotify.js'
+import {
+  getPlaylistsFromSpotify,
+  getTracksFromPlaylist,
+  getUserData
+} from '../helpers/spotify.js'
 import { PlaylistModel } from '../models/playlist.js'
 
 async function getRandomPlaylists(req, res) {
@@ -67,8 +72,38 @@ async function getPlaylistsFromDB(req, res) {
   }
 }
 
+async function getPlaylistFromId(req, res) {
+  const id = mongoose.Types.ObjectId(req.params.id)
+  const playlist = await PlaylistModel.findById(id)
+  const user = await getUserData(playlist.author.id)
+  const tracks = await getTracksFromPlaylist(playlist.spotify_id)
+
+  const tracksMapped = tracks.tracks.items.map((item) => {
+    const { track } = item
+    return {
+      _id: track.id,
+      artist: track.artists[0].name,
+      album: {
+        image: track.album?.images[0]?.url || '',
+        name: [track.album.name]
+      },
+      name: track.name,
+      duration: track.duration_ms
+    }
+  })
+  try {
+    res.status(200).json({
+      playlist,
+      authorImages: user.images,
+      tracks: tracksMapped,
+      total: tracks.tracks.total
+    })
+  } catch (error) {}
+}
+
 export {
   setPlaylistFromSpotifyToDatabase,
   getRandomPlaylists,
-  getPlaylistsFromDB
+  getPlaylistsFromDB,
+  getPlaylistFromId
 }

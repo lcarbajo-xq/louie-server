@@ -51,4 +51,39 @@ async function getPlaylistsFromSpotify() {
   }
 }
 
-export { getArtistImageFromSpotify, getPlaylistsFromSpotify }
+async function getUserData(id) {
+  try {
+    const accessToken = await getAccessToken()
+    const url = `https://api.spotify.com/v1/users/${id}`
+    const { data } = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    })
+    return data
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+async function getTracksFromPlaylist(id) {
+  try {
+    const accessToken = await getAccessToken()
+    const url = `https://api.spotify.com/v1/playlists/${id}`
+    const { data } = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    })
+    return data
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+export {
+  getArtistImageFromSpotify,
+  getTracksFromPlaylist,
+  getPlaylistsFromSpotify,
+  getUserData
+}
